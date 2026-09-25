@@ -30,6 +30,62 @@
       <span id="invoiceStatus" class="file-name"></span>
     </section>
 
+    <section class="cmr-sheet ref-cmr" id="cmrSheet">
+<div class="ref-top">
+ <div class="ref-sender"><b>1</b><span>Отправитель (наименование, адрес, страна)<br><i>Absender (Name, Anschrift, Land)</i></span><textarea id="sender"></textarea></div>
+ <div class="ref-title"><strong>Международная<br>товарно-транспортная<br>накладная<br>International<br>Frachtbrief<br>Lettre de voiture</strong><em>CMR</em><p>Данная перевозка, несмотря<br>на всякие прочие договоры,<br>осуществляется в соответствии<br>с условиями Конвенции о договоре<br>международной дорожной перевозки грузов (КДПГ)</p></div>
+</div>
+<div class="ref-row row2"><div class="ref-cell"><b>2</b><label>Получатель (наименование, адрес, страна)<br><i>Empfänger (Name, Anschrift, Land)</i></label><textarea id="consignee"></textarea></div><div class="ref-cell"><b>16</b><label>Перевозчик (наименование, адрес, страна)<br><i>Frachtführer (Name, Anschrift, Land)</i></label><textarea id="carrier"></textarea></div></div>
+<div class="ref-row row3"><div class="ref-cell"><b>3</b><label>Место разгрузки груза<br><i>Auslieferungsort des Gutes</i></label><textarea id="deliveryPlace"></textarea><small>Место / Ort<br>Страна / Land</small></div><div class="ref-cell"><b>17</b><label>Последующий перевозчик (наименование, адрес, страна)<br><i>Nachfolgende Frachtführer (Name, Anschrift, Land)</i></label><textarea id="successiveCarriers"></textarea></div></div>
+<div class="ref-row row4"><div class="ref-cell"><b>4</b><label>Место и дата погрузки груза<br><i>Ort und Tag der Übernahme des Gutes</i></label><textarea id="loadingPlace"></textarea><small>Место / Ort<br>Страна / Land &nbsp;&nbsp;&nbsp; Дата / Datum</small></div><div class="ref-cell ref18"><b>18</b><label>Оговорки и замечания перевозчика<br><i>Vorbehalte und Bemerkungen der Frachtführer</i></label><textarea id="reservations"></textarea></div></div>
+<div class="ref-row row5"><div class="ref-cell"><b>5</b><label>Прилагаемые документы<br><i>Beigefügte Dokumente</i></label><textarea id="documents"></textarea></div><div class="ref-cell ref18fill"></div></div>
+<div class="ref-goods">
+<table id="goodsTable"><thead><tr><th><b>6</b> Знаки и номера<br><i>Kennzeichen und Nummern</i></th><th><b>7</b> Количество мест<br><i>Anzahl der Packstücke</i></th><th><b>8</b> Род упаковки<br><i>Art der Verpackung</i></th><th><b>9</b> Наименование груза<br><i>Bezeichnung des Gutes</i></th><th><b>10</b> Статист. №<br><i>Statistik-Nr.</i></th><th><b>11</b> Вес брутто, кг<br><i>Bruttogew., kg</i></th><th><b>12</b> Объем, м³<br><i>Umfang in m³</i></th><th class="screen-only"></th></tr></thead>
+<tbody><tr><td><input></td><td><input type="number"></td><td><input placeholder="boxes"></td><td><input placeholder="Frozen fish"></td><td><input class="net" type="number" step=".01" title="Net weight"></td><td><input class="gross" type="number" step=".01"></td><td><input type="number" step=".001"></td><td class="screen-only"><button class="remove-row" type="button">×</button></td></tr></tbody></table>
+<div class="watermark">CMR</div><button id="addRow" class="screen-only add-line" type="button">+ Add item</button>
+<div class="ref-adr"><span>Класс<br>Klasse</span><span>Цифра<br>Ziffer</span><span>Буква<br>Buchstabe</span><span>ДОПОГ<br>ADR</span></div>
+<div class="totals"><span>Net: <strong id="totalNet">0.00 kg</strong></span><span>Gross: <strong id="totalGross">0.00 kg</strong></span></div>
+</div>
+<div class="ref-mid"><div class="ref-cell"><b>13</b><label>Указания отправителя (таможенная и прочая обработка)<br><i>Anweisungen des Absenders</i></label><textarea id="instructions"></textarea></div><div class="ref-pay"><b>19</b><span>Подлежит оплате:</span><div class="paycols"><span></span><span>Отправитель</span><span>Валюта</span><span>Получатель</span><span>Ставка</span><input><input><input><span>Скидки</span><input><input><input><span>Разность</span><input><input><input><span>Надбавки</span><input><input><input><span>К оплате</span><input><input><input></div></div></div>
+<div class="ref-row short"><div class="ref-cell"><b>14</b><label>Возврат<br><i>Rückerstattung</i></label><textarea id="cod"></textarea></div><div class="ref-cell"><b>20</b><label>Особые согласованные условия<br><i>Besondere Vereinbarungen</i></label><textarea id="specialAgreements"></textarea></div></div>
+<div class="ref-row short"><div class="ref-cell"><b>15</b><label>Указания перевозчика<br><i>Frachtzahlanweisungen</i></label><textarea id="charges"></textarea></div><div class="ref-cell"></div></div>
+<div class="ref-date"><b>21</b> Составлена в <input id="established"><span>Дата ____ / ____ / 20__</span></div>
+<div class="ref-sign"><div><b>22</b><textarea id="senderSign"></textarea><small>Подпись или штамп отправителя<br><i>Unterschrift und Stempel des Absenders</i></small></div><div><b>23</b><input id="vehicleNumber" placeholder="Путевой лист № / автомобиль"><textarea id="carrierSignature"></textarea><small>Подпись или штамп перевозчика<br><i>Unterschrift und Stempel des Frachtführers</i></small></div><div><b>24</b><textarea id="goodsReceived"></textarea><small>Груз получен / Gut empfangen<br>Подпись и штамп получателя</small></div></div>
+<div class="ref-tariff-head"><div><b>25</b> Регистрац. номер / Amtl. Kennzeichen<br><input></div><div><b>26</b> Марка / Тип</div><div><b>27</b> Тариф</div><div>Тарифное расстояние</div><div>Поясной километр</div><div>Прочие доплаты</div><div>К оплате</div></div>
+<div class="ref-tariff-body"><b>28</b><span>Тариф I</span><span>Тарифное расстояние, км</span><span>Схема</span><span>Тарифный вес, ц</span><span>Надбавки</span><span>Скидки</span><span>Прочие доплаты</span><span>К оплате</span></div>
+<div class="ref-tariff-body last"><b>29</b><span>Тариф II</span><span></span><span></span><span></span><span></span><span></span><span></span><span>К оплате</span></div>
+</section>l>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CMR Generator</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>CMR Generator</h1>
+      <p>Create and export an international CMR consignment note.</p>
+    </div>
+    <button id="downloadPdf" class="primary">Download PDF</button>
+  </header>
+
+  <main class="app">
+    <section class="panel upload-panel">
+      <div>
+        <h2>1. Upload invoice</h2>
+        <p>Upload PDF or image. In this prototype the file is attached locally; automatic data extraction will be connected next.</p>
+      </div>
+      <label class="upload-btn">
+        Choose invoice
+        <input id="invoiceInput" type="file" accept=".pdf,image/*" hidden />
+      </label>
+      <span id="fileName" class="file-name">No file selected</span>
+      <button id="processInvoice" class="secondary" type="button" disabled>Read invoice</button>
+      <span id="invoiceStatus" class="file-name"></span>
+    </section>
+
     <section class="cmr-sheet official-cmr" id="cmrSheet">
 <div class="cmr-top">
  <div class="top-copy">1&nbsp; Exemplar za pošiljaoca<br><span>Copy for sender</span></div>
