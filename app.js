@@ -59,18 +59,67 @@ processInvoice.addEventListener('click', async ()=>{
         text += content.items.map(i=>i.str).join(' ')+'\n';
       }
     } else {
-      invoiceStatus.textContent='Image selected. OCR will be connected in the next version; PDF invoices can already be read.';
+      invoiceStatus.textContent='Image selected. OCR for scanned invoices will be added next.';
       return;
     }
-    const lines=text.split(/\n+/).map(s=>s.trim()).filter(Boolean);
-    document.getElementById('documents').value = 'Invoice: ' + file.name;
-    const weight=text.match(/(?:net(?:to)?\s*(?:weight)?|net)[^0-9]{0,15}([0-9][0-9 .,'’]*)(?:\s*kg)/i);
-    const gross=text.match(/(?:gross(?:\s*weight)?|brutto)[^0-9]{0,15}([0-9][0-9 .,'’]*)(?:\s*kg)/i);
+
+    const one=text.replace(/\s+/g,' ').trim();
+    const set=(id,val)=>{ if(val && document.getElementById(id)) document.getElementById(id).value=val.trim(); };
+    const pick=(re)=>{ const m=one.match(re); return m ? m[1].trim() : ''; };
+
+    // DELICA / Merit-style invoices: prefer explicit logistics notes when present.
+    const consignee = pick(/(?:Покупатель\/Грузополучатель|Buyer\/Consignee)\s*:\s*(.+?)(?=\s+(?:Продавец\/\s*Грузоотправитель|Seller\/Consignor|Производитель|Manufacturer)\s*:)/i);
+    const sender = pick(/(?:Продавец\/\s*Грузоотправитель|Seller\/Consignor)\s*:\s*(.+?)(?=\s+(?:Производитель|Manufacturer|Происхождение|Origin)\s*:)/i);
+    const unloading = pick(/(?:Место выгрузки|Place of unloading)\s*:\s*(.+?)(?=\s+(?:Код товара|Commodity code|Сроки поставки|Delivery terms)\s*:)/i);
+    const vehicle = pick(/(?:Номер машины|Vehicle(?: registration)?|Truck)\s*:\s*(.+?)(?=\s+(?:Покупатель\/Грузополучатель|Buyer\/Consignee)\s*:)/i);
+    const invoiceNo = pick(/Invoice\s*(?:no|No\.?|№)\s*([A-Z0-9\/-]+)/i);
+    const issueDate = pick(/Issue date\s*:\s*([0-9.\/-]+)/i);
+    const origin = pick(/(?:Происхождение|Origin)\s*:\s*(.+?)(?=\s+(?:Место выгрузки|Place of unloading)\s*:)/i);
+    const code = pick(/(?:Код товара|Commodity code|HS code)\s*:\s*([0-9]+)/i);
+
+    set('sender', sender || pick(/Seller:\s*(.+?)(?=\s+(?:Bank name|№ Description|Description))/i));
+    set('consignee', consignee || pick(/Client\s+(.+?)(?=\s+Invoice\s*(?:no|No|№))/i));
+    set('deliveryPlace', unloading);
+    set('vehicleNumber', vehicle);
+    set('documents', 'Invoice No ' + (invoiceNo || file.name) + (issueDate ? ', '+issueDate : ''));
+    set('instructions', origin ? 'Origin: '+origin : '');
+
+    // Product rows: recognize description + Packing + Boxes + kg quantity.
+    const productRe=/(Frozen\s+Salmon\s+Backbones[^]*?|Salmon\s+Bellies[^]*?)(?=(?:\s+\d+\.\s+)?(?:Frozen\s+Salmon|Salmon\s+Bellies)|Amount\s+w\/o\s+VAT|TOTAL)/gi;
+    const blocks=[...text.matchAll(productRe)].map(m=>m[1]);
+    if(blocks.length){
+      tbody.innerHTML='';
+      blocks.forEach(block=>{
+        const compact=block.replace(/\s+/g,' ');
+        const desc=(compact.match(/^(.*?)(?=\s+Packing\s*:)/i)||[])[1] || compact.slice(0,100);
+        const packing=(compact.match(/Packing\s*:\s*([0-9.,]+\s*kg)/i)||[])[1] || '';
+        const boxes=(compact.match(/Boxes\s*:\s*([0-9]+)\s*pc/i)||[])[1] || '';
+        // quantity is the kg value appearing after "pc" in these invoices
+        const qty=(compact.match(/Boxes\s*:\s*[0-9]+\s*pc\s*(?:kg\s*)?([0-9]+(?:[.,][0-9]+)?)/i)||[])[1] || '';
+        tbody.insertAdjacentHTML('beforeend', `<tr>
+          <td><input value=""></td>
+          <td><input type="number" value="${boxes}"></td>
+          <td><input value="${packing.replace(/"/g,'&quot;')}"></td>
+          <td><input value="${desc.replace(/"/g,'&quot;')}"></td>
+          <td><input class="gross" type="number" step="0.01"></td>
+          <td><input type="number" step="0.001"></td>
+          <td><input class="net" type="number" step="0.01" value="${qty.replace(',','.')}"></td>
+          <td class="screen-only"><button class="remove-row" type="button">×</button></td>
+        </tr>`);
+      });
+    }
+
+    // Fallback totals when explicitly printed.
+    const net=one.match(/(?:Нетто|Net(?: weight)?)[^0-9]{0,20}([0-9][0-9 .,'’]*)\s*kg/i);
+    const gross=one.match(/(?:Брутто|Gross(?: weight)?)[^0-9]{0,20}([0-9][0-9 .,'’]*)\s*kg/i);
     const clean=n=>parseFloat(n.replace(/[ '’]/g,'').replace(',','.'));
-    if(weight && document.querySelector('.net')) document.querySelector('.net').value=clean(weight[1])||'';
+    if(net && !blocks.length && document.querySelector('.net')) document.querySelector('.net').value=clean(net[1])||'';
     if(gross && document.querySelector('.gross')) document.querySelector('.gross').value=clean(gross[1])||'';
+
+    // If one commodity code applies to the whole invoice, put it in marks/reference column.
+    if(code) [...tbody.querySelectorAll('tr')].forEach(tr=>{ const i=tr.querySelector('td:first-child input'); if(i && !i.value)i.value=code; });
     recalc();
-    invoiceStatus.textContent = 'Invoice read. Check the extracted fields and complete anything missing.';
+    invoiceStatus.textContent = 'Invoice read. CMR fields were filled automatically — please verify before export.';
   }catch(err){
     console.error(err);
     invoiceStatus.textContent='Could not read this invoice. You can still fill the CMR manually.';
