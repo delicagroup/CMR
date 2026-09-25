@@ -10,11 +10,10 @@ function rowHtml(){
       <td><input type="number" min="0" /></td>
       <td><input placeholder="boxes" /></td>
       <td><input placeholder="Frozen fish" /></td>
-      <td><input /></td>
       <td><input class="gross" type="number" step="0.01" min="0" /></td>
       <td><input type="number" step="0.001" min="0" /></td>
       <td><input class="net" type="number" step="0.01" min="0" /></td>
-      <td><button class="remove-row" type="button">×</button></td>
+      <td class="screen-only"><button class="remove-row" type="button">×</button></td>
     </tr>`;
 }
 
