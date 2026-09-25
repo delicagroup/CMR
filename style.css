@@ -87,3 +87,23 @@ textarea{resize:vertical;min-height:68px}.compact{min-height:92px}.highlight{bac
   transform:none!important;
 }
 @page{size:A4 portrait;margin:0}
+
+/* Final source-of-truth: uploaded cmr-blank1.doc is an A4 portrait CMR with fields 1-29. */
+.ref-cmr{
+  width:210mm!important;
+  height:297mm!important;
+  min-height:297mm!important;
+  max-height:297mm!important;
+  padding:3.2mm 4.5mm 2.5mm!important;
+  margin:0 auto!important;
+  overflow:hidden!important;
+  border:0!important;
+}
+.ref-top{height:27mm}.row2{height:23mm}.row3{height:18mm}.row4{height:17.5mm}.row5{height:15.5mm}
+.ref-goods{height:47mm}.ref-mid{height:31mm}.short{height:12mm}.ref-date{height:8mm}.ref-sign{height:31mm}
+.ref-tariff-head{height:10.5mm}.ref-tariff-body{height:14mm}.ref-tariff-body.last{height:13mm}
+.ref-cmr textarea,.ref-cmr input{line-height:1.05}
+.pdf-export{
+ width:210mm!important;height:297mm!important;min-height:297mm!important;max-height:297mm!important;
+ padding:3.2mm 4.5mm 2.5mm!important;margin:0!important;overflow:hidden!important;
+}
