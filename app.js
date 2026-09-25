@@ -1,4 +1,4 @@
-const tbody = document.querySelector('#goodsTable tbody');
+function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}\nconst tbody = document.querySelector('#goodsTable tbody');
 const addRow = document.getElementById('addRow');
 const fileInput = document.getElementById('invoiceInput');
 const fileName = document.getElementById('fileName');
@@ -45,71 +45,72 @@ fileInput.addEventListener('change',()=>{
 
 processInvoice.addEventListener('click', async ()=>{
   const file=fileInput.files?.[0]; if(!file) return;
-  invoiceStatus.textContent='Reading invoice…';
+  invoiceStatus.textContent='AI is analyzing the complete invoice…';
+  processInvoice.disabled=true;
   try{
-    if(!(file.type==='application/pdf'||file.name.toLowerCase().endsWith('.pdf'))){
-      invoiceStatus.textContent='For now upload a text PDF invoice. Image OCR comes next.'; return;
-    }
-    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;
-    let pages=[];
-    for(let p=1;p<=pdf.numPages;p++){
-      const page=await pdf.getPage(p), tc=await page.getTextContent();
-      const items=tc.items.map(x=>({s:x.str.trim(),x:x.transform[4],y:x.transform[5]})).filter(x=>x.s);
-      items.sort((a,b)=>Math.abs(b.y-a.y)>3?b.y-a.y:a.x-b.x);
-      let lines=[];
-      for(const it of items){
-        let line=lines.find(l=>Math.abs(l.y-it.y)<3);
-        if(!line){line={y:it.y,a:[]};lines.push(line)} line.a.push(it);
-      }
-      lines.sort((a,b)=>b.y-a.y);
-      pages.push(lines.map(l=>l.a.sort((a,b)=>a.x-b.x).map(z=>z.s).join(' ')).join('\n'));
-    }
-    const text=pages.join('\n'), one=text.replace(/\s+/g,' ').trim();
-    const set=(id,v)=>{const el=document.getElementById(id);if(el&&v)el.value=v.trim()};
-    const pick=re=>{const m=one.match(re);return m?m[1].trim():''};
+    const base64=await new Promise((resolve,reject)=>{
+      const r=new FileReader();
+      r.onload=()=>resolve(String(r.result).split(',')[1]);
+      r.onerror=reject;
+      r.readAsDataURL(file);
+    });
+    const res=await fetch('/api/analyze',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({filename:file.name,mimeType:file.type||'application/pdf',base64})
+    });
+    const body=await res.json();
+    if(!res.ok) throw new Error(body.error||'Analysis failed');
+    const d=body.data||{};
+    const set=(id,v)=>{const el=document.getElementById(id);if(el&&v!==undefined&&v!==null)el.value=String(v)};
 
-    const sender=pick(/Продавец\s*\/\s*Грузоотправитель\s*:\s*(.+?)(?=\s+(?:Производитель|Происхождение)\s*:)/i)||pick(/Seller\s*:\s*(.+?)(?=\s+(?:Reg\.|Bank|№\s*Description))/i);
-    const consignee=pick(/Покупатель\s*\/\s*Грузополучатель\s*:\s*(.+?)(?=\s+Продавец\s*\/\s*Грузоотправитель\s*:)/i)||pick(/Client\s+(.+?)(?=\s+Invoice\s+no)/i);
-    const unloading=pick(/Место выгрузки\s*:\s*(.+?)(?=\s+Код товара\s*:)/i);
-    const vehicle=pick(/Номер машины\s*:\s*(.+?)(?=\s+Покупатель\s*\/\s*Грузополучатель\s*:)/i);
-    const inv=pick(/Invoice\s+no\s+([A-Z0-9\/-]+)/i);
-    const date=pick(/Issue date\s*:\s*([0-9.\/-]+)/i);
-    const code=pick(/Код товара\s*:\s*([0-9]+)/i);
-    const origin=pick(/Происхождение\s*:\s*(.+?)(?=\s+Место выгрузки\s*:)/i);
-    set('sender',sender);set('consignee',consignee);set('deliveryPlace',unloading);set('vehicleNumber',vehicle);
-    set('documents',`Invoice No ${inv||file.name}${date?', '+date:''}`);
-    set('instructions',origin?`Origin: ${origin}`:'');
+    const sender=[d.sender?.name,d.sender?.address,d.sender?.country].filter(Boolean).join('\n');
+    const consignee=[d.consignee?.name,d.consignee?.address,d.consignee?.country].filter(Boolean).join('\n');
+    const carrier=[d.carrier?.name,d.carrier?.address,d.carrier?.country].filter(Boolean).join('\n');
+    set('sender',sender); set('consignee',consignee); set('carrier',carrier);
+    set('deliveryPlace',[d.delivery?.place,d.delivery?.address,d.delivery?.country].filter(Boolean).join('\n'));
+    set('loadingPlace',[d.loading?.place,d.loading?.address,d.loading?.country,d.loading?.date,d.loading?.time].filter(Boolean).join('\n'));
+    set('vehicleNumber',[d.vehicle?.truck,d.vehicle?.trailer].filter(Boolean).join(' / '));
+    set('documents',[d.invoice?.number&&('Invoice '+d.invoice.number),d.invoice?.date,d.packing_list_number&&('Packing list '+d.packing_list_number)].filter(Boolean).join(', '));
+    const instructions=[
+      d.origin_country&&('Origin: '+d.origin_country),
+      d.temperature&&('Temperature: '+d.temperature),
+      d.incoterms&&('Incoterms: '+d.incoterms),
+      d.manufacturer?.name&&('Manufacturer: '+[d.manufacturer.name,d.manufacturer.address,d.manufacturer.country].filter(Boolean).join(', '))
+    ].filter(Boolean).join('\n');
+    set('instructions',instructions);
 
-    // Parse the actual DELICA invoice product pattern from the uploaded test invoice.
-    const lines=text.split('\n').map(x=>x.trim()).filter(Boolean);
-    const products=[];
-    for(let i=0;i<lines.length;i++){
-      if(/Frozen Salmon Backbones/i.test(lines[i])||/Salmon Bellies/i.test(lines[i])){
-        let block=lines.slice(i,Math.min(i+4,lines.length)).join(' ');
-        const desc=(block.match(/^(.*?)(?=\s+Packing\s*:)/i)||[])[1]||lines[i];
-        const pack=(block.match(/Packing\s*:\s*([0-9.,]+\s*kg)/i)||[])[1]||'';
-        const boxes=(block.match(/Boxes\s*:\s*([0-9]+)\s*pc/i)||[])[1]||'';
-        let qty='';
-        const qm=block.match(/\bkg\s+([0-9]+(?:[.,][0-9]+)?)\s+[0-9]+[.,][0-9]+/i);
-        if(qm)qty=qm[1].replace(',','.');
-        products.push({desc,pack,boxes,qty});
-      }
-    }
-    if(products.length){
+    const items=Array.isArray(d.items)?d.items:[];
+    if(items.length){
       tbody.innerHTML='';
-      for(const p of products) tbody.insertAdjacentHTML('beforeend',`<tr>
-        <td><input></td><td><input type="number" value="${p.boxes}"></td>
-        <td><input value="${p.pack}"></td><td><input value="${p.desc.replace(/"/g,'&quot;')}"></td>
-        <td><input class="stat-code" value="${code}"></td>
-        <td><input class="gross" type="number" step=".01"></td><td><input type="number" step=".001"></td>
-        <td class="screen-only"><button class="remove-row" type="button">×</button></td></tr>`);
-      // CMR has gross weight only. Invoice quantities are net; if gross isn't supplied, show net in goods text instead of mislabelling it gross.
-      products.forEach((p,idx)=>{if(p.qty){const d=tbody.rows[idx].cells[3].querySelector('input');d.value += ` | Net ${p.qty} kg`;}})
+      for(const p of items){
+        const netNote=p.net_weight_kg!=null?(' | Net '+p.net_weight_kg+' kg'):'';
+        tbody.insertAdjacentHTML('beforeend',`<tr>
+          <td><input value="${esc(p.marks||'')}"></td>
+          <td><input type="number" value="${esc(p.packages_count??'')}"></td>
+          <td><input value="${esc(p.packaging||'')}"></td>
+          <td><input value="${esc((p.description||'')+netNote)}"></td>
+          <td><input class="stat-code" value="${esc(p.hs_code||d.hs_code||'')}"></td>
+          <td><input class="gross" type="number" step=".01" value="${esc(p.gross_weight_kg??'')}"></td>
+          <td><input type="number" step=".001" value="${esc(p.volume_m3??'')}"></td>
+          <td class="screen-only"><button class="remove-row" type="button">×</button></td>
+        </tr>`);
+      }
     }
     recalc();
-    invoiceStatus.textContent=products.length?'Invoice read successfully. Please verify the CMR before export.':'Invoice text read, but product rows need manual review.';
-  }catch(err){console.error(err);invoiceStatus.textContent='Could not read this PDF. Please try the uploaded test invoice again.'}
+    const missing=[];
+    if(!d.sender?.name) missing.push('sender');
+    if(!d.consignee?.name) missing.push('consignee');
+    if(!items.length) missing.push('goods');
+    invoiceStatus.textContent=missing.length
+      ? 'Invoice analyzed. Please check: '+missing.join(', ')+'.'
+      : 'Invoice analyzed successfully. Please verify the CMR before export.';
+  }catch(err){
+    console.error(err);
+    invoiceStatus.textContent='AI analysis failed: '+err.message;
+  }finally{
+    processInvoice.disabled=false;
+  }
 });
 
 document.getElementById('downloadPdf').addEventListener('click', async ()=>{
