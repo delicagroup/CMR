@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CMR Generator</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>CMR Generator</h1>
+      <p>Create and export an international CMR consignment note.</p>
+    </div>
+    <button id="downloadPdf" class="primary">Download PDF</button>
+  </header>
+
+  <main class="app">
+    <section class="panel upload-panel">
+      <div>
+        <h2>1. Upload invoice</h2>
+        <p>Upload PDF or image. In this prototype the file is attached locally; automatic data extraction will be connected next.</p>
+      </div>
+      <label class="upload-btn">
+        Choose invoice
+        <input id="invoiceInput" type="file" accept=".pdf,image/*" hidden />
+      </label>
+      <span id="fileName" class="file-name">No file selected</span>
+    </section>
+
+    <section class="cmr-sheet" id="cmrSheet">
+      <div class="cmr-title">
+        <div>
+          <span class="badge">CMR</span>
+          <h2>International Consignment Note</h2>
+        </div>
+        <div class="small-note">Convention relative au contrat de transport international de marchandises par route</div>
+      </div>
+
+      <div class="grid two">
+        <div class="box">
+          <div class="box-number">1</div>
+          <label>Sender (name, address, country)</label>
+          <textarea id="sender" placeholder="DELICA GROUP OÜ&#10;Koplipere tee 21&#10;Rae, Estonia"></textarea>
+        </div>
+        <div class="box">
+          <div class="box-number">2</div>
+          <label>Consignee (name, address, country)</label>
+          <textarea id="consignee" placeholder="Customer name&#10;Address&#10;Country"></textarea>
+        </div>
+      </div>
+
+      <div class="grid two">
+        <div class="box">
+          <div class="box-number">3</div>
+          <label>Place of delivery of the goods</label>
+          <textarea id="deliveryPlace"></textarea>
+        </div>
+        <div class="box">
+          <div class="box-number">4</div>
+          <label>Place and date of taking over the goods</label>
+          <textarea id="loadingPlace"></textarea>
+        </div>
+      </div>
+
+      <div class="grid two">
+        <div class="box">
+          <div class="box-number">5</div>
+          <label>Documents attached</label>
+          <textarea id="documents" placeholder="Invoice, packing list, veterinary certificate..."></textarea>
+        </div>
+        <div class="box">
+          <div class="box-number">16</div>
+          <label>Carrier (name, address, country)</label>
+          <textarea id="carrier"></textarea>
+        </div>
+      </div>
+
+      <div class="goods-section box">
+        <div class="goods-head">
+          <div>
+            <strong>6–12 Goods</strong>
+            <span>Marks, packages, description, weights</span>
+          </div>
+          <button id="addRow" type="button">+ Add item</button>
+        </div>
+
+        <div class="table-wrap">
+          <table id="goodsTable">
+            <thead>
+              <tr>
+                <th>6 Marks / No.</th>
+                <th>7 Packages</th>
+                <th>8 Packing</th>
+                <th>9 Description of goods</th>
+                <th>10 Statistical No.</th>
+                <th>11 Gross kg</th>
+                <th>12 Volume m³</th>
+                <th>Net kg</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input /></td>
+                <td><input type="number" min="0" /></td>
+                <td><input placeholder="boxes" /></td>
+                <td><input placeholder="Frozen fish" /></td>
+                <td><input /></td>
+                <td><input class="gross" type="number" step="0.01" min="0" /></td>
+                <td><input type="number" step="0.001" min="0" /></td>
+                <td><input class="net" type="number" step="0.01" min="0" /></td>
+                <td><button class="remove-row" type="button">×</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="totals">
+          <div><span>Total net:</span> <strong id="totalNet">0.00 kg</strong></div>
+          <div><span>Total gross:</span> <strong id="totalGross">0.00 kg</strong></div>
+        </div>
+      </div>
+
+      <div class="grid two">
+        <div class="box">
+          <div class="box-number">13</div>
+          <label>Sender's instructions</label>
+          <textarea id="instructions" placeholder="Keep frozen at -18°C"></textarea>
+        </div>
+        <div class="box">
+          <div class="box-number">14</div>
+          <label>Cash on delivery</label>
+          <textarea id="cod"></textarea>
+        </div>
+      </div>
+
+      <div class="grid two">
+        <div class="box">
+          <div class="box-number">15</div>
+          <label>Carriage charges</label>
+          <textarea id="charges"></textarea>
+        </div>
+        <div class="box">
+          <div class="box-number">17</div>
+          <label>Successive carriers</label>
+          <textarea id="successiveCarriers"></textarea>
+        </div>
+      </div>
+
+      <div class="grid two">
+        <div class="box">
+          <div class="box-number">18</div>
+          <label>Carrier's reservations and observations</label>
+          <textarea id="reservations"></textarea>
+        </div>
+        <div class="box">
+          <div class="box-number">19</div>
+          <label>Special agreements</label>
+          <textarea id="specialAgreements"></textarea>
+        </div>
+      </div>
+
+      <div class="grid three">
+        <div class="box compact">
+          <div class="box-number">20</div>
+          <label>To be paid by</label>
+          <input id="paidBy" />
+        </div>
+        <div class="box compact">
+          <div class="box-number">21</div>
+          <label>Established in / on</label>
+          <input id="established" />
+        </div>
+        <div class="box compact">
+          <div class="box-number">22</div>
+          <label>Sender signature / stamp</label>
+          <input id="senderSign" placeholder="Name / stamp" />
+        </div>
+      </div>
+
+      <div class="grid two">
+        <div class="box highlight">
+          <div class="box-number">23</div>
+          <label>Carrier / vehicle registration</label>
+          <input id="vehicleNumber" placeholder="Truck / trailer registration number" />
+          <textarea id="carrierSignature" placeholder="Carrier signature / stamp"></textarea>
+        </div>
+        <div class="box">
+          <div class="box-number">24</div>
+          <label>Goods received</label>
+          <textarea id="goodsReceived" placeholder="Place, date, consignee signature / stamp"></textarea>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
