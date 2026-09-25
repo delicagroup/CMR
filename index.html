@@ -54,90 +54,10 @@
 <div class="ref-tariff-head"><div><b>25</b> Регистрац. номер / Amtl. Kennzeichen<br><input></div><div><b>26</b> Марка / Тип</div><div><b>27</b> Тариф</div><div>Тарифное расстояние</div><div>Поясной километр</div><div>Прочие доплаты</div><div>К оплате</div></div>
 <div class="ref-tariff-body"><b>28</b><span>Тариф I</span><span>Тарифное расстояние, км</span><span>Схема</span><span>Тарифный вес, ц</span><span>Надбавки</span><span>Скидки</span><span>Прочие доплаты</span><span>К оплате</span></div>
 <div class="ref-tariff-body last"><b>29</b><span>Тариф II</span><span></span><span></span><span></span><span></span><span></span><span></span><span>К оплате</span></div>
-</section>l>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>CMR Generator</title>
-<link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <header class="topbar">
-    <div>
-      <h1>CMR Generator</h1>
-      <p>Create and export an international CMR consignment note.</p>
-    </div>
-    <button id="downloadPdf" class="primary">Download PDF</button>
-  </header>
-
-  <main class="app">
-    <section class="panel upload-panel">
-      <div>
-        <h2>1. Upload invoice</h2>
-        <p>Upload PDF or image. In this prototype the file is attached locally; automatic data extraction will be connected next.</p>
-      </div>
-      <label class="upload-btn">
-        Choose invoice
-        <input id="invoiceInput" type="file" accept=".pdf,image/*" hidden />
-      </label>
-      <span id="fileName" class="file-name">No file selected</span>
-      <button id="processInvoice" class="secondary" type="button" disabled>Read invoice</button>
-      <span id="invoiceStatus" class="file-name"></span>
-    </section>
-
-    <section class="cmr-sheet official-cmr" id="cmrSheet">
-<div class="cmr-top">
- <div class="top-copy">1&nbsp; Exemplar za pošiljaoca<br><span>Copy for sender</span></div>
- <div class="top-logo">CMR</div>
- <div class="top-title">MEĐUNARODNA TOVARITELJNICA<br><span>INTERNATIONAL CONSIGNMENT NOTE</span></div>
- <div class="top-no">No. <input id="cmrNumber"></div>
-</div>
-<div class="r r1">
- <div class="cell"><b>1.</b><label>Pošiljalac (ime, adresa, zemlja)<br><i>Sender (name, address, country)</i></label><textarea id="sender"></textarea></div>
- <div class="cell"><b>6.</b><label>Prevozilac (ime, adresa, zemlja, druge oznake)<br><i>Carrier (name, address, country, other references)</i></label><textarea id="carrier"></textarea></div>
-</div>
-<div class="r r2">
- <div class="cell"><b>2.</b><label>Primalac (ime, adresa, zemlja)<br><i>Consignee (name, address, country)</i></label><textarea id="consignee"></textarea></div>
- <div class="cell"><b>7.</b><label>Uzastopni prevozioci / Successive carriers</label><textarea id="successiveCarriers"></textarea></div>
-</div>
-<div class="r r3">
- <div class="cell"><b>3.</b><label>Preuzimanje robe / Taking over the goods<br><i>Mesto / Place &nbsp;&nbsp; Zemlja / Country &nbsp;&nbsp; Datum / Date &nbsp;&nbsp; Vreme / Time</i></label><textarea id="loadingPlace"></textarea></div>
- <div class="cell tall8"><b>8.</b><label>Rezerve i zapažanja prevozioca na tovarnom listu<br><i>Carrier's reservations and observations on taking over the goods</i></label><textarea id="reservations"></textarea></div>
-</div>
-<div class="r r4">
- <div class="cell"><b>4.</b><label>Rastovarivanje na mestu / Delivery of the goods<br><i>Mesto / Place &nbsp;&nbsp; Zemlja / Country</i></label><textarea id="deliveryPlace"></textarea></div>
- <div class="cell blank8"></div>
-</div>
-<div class="r r5">
- <div class="cell"><b>5.</b><label>Uputstva od pošiljaoca / Sender's instructions</label><textarea id="instructions"></textarea></div>
- <div class="cell"><b>9.</b><label>Dokumenti, predati prevozniku od pošiljaoca<br><i>Documents handed to the carrier by the sender</i></label><textarea id="documents"></textarea></div>
-</div>
-<div class="goods-official">
-<table id="goodsTable"><thead><tr>
-<th><b>10.</b><br>Znaci za robu<br><i>Marks and Nos</i></th><th><b>11.</b><br>Broj koleta<br><i>Number of packages</i></th><th><b>12.</b><br>Način pakovanja<br><i>Method of packing</i></th><th><b>13.</b><br>Priroda robe<br><i>Nature of the goods</i></th><th><b>14.</b><br>Težina bruto, kg<br><i>Gross weight kg</i></th><th><b>15.</b><br>Obim, m³<br><i>Volume m³</i></th><th>Net weight kg</th><th class="screen-only"></th>
-</tr></thead><tbody><tr><td><input></td><td><input type="number"></td><td><input placeholder="boxes"></td><td><input placeholder="Frozen fish"></td><td><input class="gross" type="number" step=".01"></td><td><input type="number" step=".001"></td><td><input class="net" type="number" step=".01"></td><td class="screen-only"><button class="remove-row" type="button">×</button></td></tr></tbody></table>
-<button id="addRow" class="screen-only add-line" type="button">+ Add item</button>
-<div class="goods-foot"><span>Broj po OOH / UN Number</span><span>Nomenklaturni broj 12 / Name no 12</span><span>Broj na etiketi za opasnost / Label Number</span><span>Označavanje tunela / Packing Group</span><span>(ADR*)</span></div>
-<div class="totals"><span>Total net: <strong id="totalNet">0.00 kg</strong></span><span>Total gross: <strong id="totalGross">0.00 kg</strong></span></div>
-</div>
-<div class="r lower">
- <div class="cell"><b>16.</b><label>Ograničena odgovornost između pošiljaoca i prevozioca<br><i>Special agreements between the sender and the carrier</i></label><textarea id="specialAgreements"></textarea></div>
- <div class="cell payment"><b>17.</b><label>Za plaćanje od / To be paid by</label><div class="paygrid"><span></span><span>Pošiljalac<br>Sender</span><span>Primalac<br>Consignee</span><span>Prevoznina / Carriage charges</span><input><input><span>Dodatno / Supplementary charges</span><input><input><span>Carina / Customs duties</span><input><input><span>Drugi troškovi / Other charges</span><input><input></div></div>
-</div>
-<div class="r r18"><div class="cell"><b>18.</b><label>Druge korisne napomene / Other useful particulars</label><textarea id="charges"></textarea></div><div class="cell"><b>19.</b><label>Gotovina / Cash on delivery</label><textarea id="cod"></textarea></div></div>
-<div class="legal20"><b>20.</b> Ovaj prevoz, nezavisno od svake protivurečne odredbe, podleže Konvenciji za međunarodni drumski prevoz robe (CMR)<br><i>This carriage is subject, notwithstanding any clause to the contrary, to the Convention on the Contract for International Carriage of Goods by Road (CMR)</i></div>
-<div class="r date21"><div class="cell"><b>21.</b><label>Utvrđeno u / Established in</label><input id="established"></div><div class="cell datefields">20___ / ___ / ___</div></div>
-<div class="signatures">
- <div class="sig"><b>22.</b><textarea id="senderSign"></textarea><span>Potpis ili pečat od pošiljaoca<br><i>Signature or stamp of the sender</i></span></div>
- <div class="sig"><b>23.</b><input id="vehicleNumber" placeholder="Vehicle / trailer registration"><textarea id="carrierSignature"></textarea><span>Potpis ili pečat prevozioca<br><i>Signature or stamp of the carrier</i></span></div>
- <div class="sig"><b>24.</b><textarea id="goodsReceived"></textarea><span>Potpis ili pečat primaoca<br><i>Signature and stamp of the consignee</i></span></div>
-</div>
-<div class="cmr-bottom">No. <span></span><small>Model IRU 2007</small></div>
 </section>
   </main>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>\n  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>\n  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
