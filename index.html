@@ -26,6 +26,8 @@
         <input id="invoiceInput" type="file" accept=".pdf,image/*" hidden />
       </label>
       <span id="fileName" class="file-name">No file selected</span>
+      <button id="processInvoice" class="secondary" type="button" disabled>Read invoice</button>
+      <span id="invoiceStatus" class="file-name"></span>
     </section>
 
     <section class="cmr-sheet" id="cmrSheet">
@@ -195,7 +197,7 @@
     </section>
   </main>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>\n  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
