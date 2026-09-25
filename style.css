@@ -107,3 +107,14 @@ textarea{resize:vertical;min-height:68px}.compact{min-height:92px}.highlight{bac
  width:210mm!important;height:297mm!important;min-height:297mm!important;max-height:297mm!important;
  padding:3.2mm 4.5mm 2.5mm!important;margin:0!important;overflow:hidden!important;
 }
+
+/* Readability override */
+.ref-cmr{font-size:8px!important}
+.ref-cmr label,.ref-sender span,.ref-title p{font-size:7px!important;line-height:1.12!important}
+.ref-cmr i{font-size:6.5px!important}
+.ref-cmr textarea,.ref-cmr input{font-size:10px!important;line-height:1.15!important}
+.ref-goods table{font-size:6.7px!important}
+.ref-goods th{font-size:6.7px!important}
+.ref-goods td input{font-size:9px!important}
+.ref-pay,.paycols,.paycols>*{font-size:6px!important}
+.ref-sign small,.ref-cell small,.ref-tariff-head,.ref-tariff-body{font-size:6px!important}
