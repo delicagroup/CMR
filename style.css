@@ -31,3 +31,13 @@ textarea{resize:vertical;min-height:68px}.compact{min-height:92px}.highlight{bac
 .totals{display:flex;justify-content:flex-end;gap:26px;padding:10px;font-size:13px}
 @media(max-width:850px){.grid.two,.grid.three{grid-template-columns:1fr}.upload-panel{grid-template-columns:1fr}.topbar{align-items:flex-start;flex-direction:column}}
 @media print{body{background:white}.topbar,.upload-panel{display:none}.app{max-width:none;padding:0}.cmr-sheet{border:0}}
+
+.secondary{background:#fff;color:var(--blue);border:1px solid var(--blue);border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer}
+.secondary:disabled{opacity:.45;cursor:not-allowed}
+.pdf-export{width:794px!important;height:1123px!important;max-height:1123px!important;overflow:hidden!important;padding:7px!important}
+.pdf-export .cmr-title{padding:2px 3px 5px}.pdf-export .badge{font-size:22px}.pdf-export .cmr-title h2{font-size:15px;margin:1px 0 0}
+.pdf-export .small-note{font-size:8px}.pdf-export .box{min-height:72px;padding:7px 6px 4px}.pdf-export .compact{min-height:56px}
+.pdf-export label,.pdf-export table{font-size:8px}.pdf-export textarea,.pdf-export input{font-size:9px;padding:2px;min-height:0}
+.pdf-export textarea{height:38px}.pdf-export .highlight textarea{height:28px}.pdf-export .goods-head{padding:4px 6px}
+.pdf-export .goods-head span{font-size:8px}.pdf-export #addRow,.pdf-export .remove-row{display:none!important}.pdf-export th,.pdf-export td{padding:2px}
+.pdf-export .totals{padding:4px 6px;font-size:9px}.pdf-export .box-number{font-size:8px}
