@@ -74,3 +74,16 @@ textarea{resize:vertical;min-height:68px}.compact{min-height:92px}.highlight{bac
 .ref-sign{height:123px;display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid #222;border-top:0}.ref-sign>div{position:relative;border-right:1px solid #222;padding:5px 5px 20px 24px}.ref-sign>div:last-child{border-right:0}.ref-sign b{position:absolute;left:6px;top:4px;font-size:14px}.ref-sign textarea{width:100%;height:68px;min-height:0}.ref-sign input{width:100%;height:22px}.ref-sign small{position:absolute;bottom:4px;left:6px;font-size:5px}
 .ref-tariff-head{height:43px;display:grid;grid-template-columns:2fr .8fr .7fr 1.2fr 1fr 1fr 1fr;border:1px solid #222;border-top:0;font-size:5px}.ref-tariff-head>div{border-right:1px solid #222;padding:4px}.ref-tariff-head b,.ref-tariff-body b{font-size:13px;margin-right:3px}.ref-tariff-body{height:57px;display:grid;grid-template-columns:.35fr .6fr 1.2fr .5fr .8fr .8fr .8fr 1fr 1fr;border:1px solid #222;border-top:0;font-size:5px}.ref-tariff-body>*{border-right:1px solid #bbb;padding:4px}.ref-tariff-body.last{height:54px}
 .pdf-export{width:794px!important;height:1123px!important;max-height:1123px!important;padding:12px 20px!important}.pdf-export .screen-only{display:none!important}
+
+/* Hard guarantee: exported CMR is exactly one A4 page */
+.pdf-export{
+  width:210mm!important;
+  height:297mm!important;
+  min-height:297mm!important;
+  max-height:297mm!important;
+  padding:3mm 5mm!important;
+  margin:0!important;
+  overflow:hidden!important;
+  transform:none!important;
+}
+@page{size:A4 portrait;margin:0}
