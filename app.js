@@ -134,11 +134,22 @@ document.getElementById('downloadPdf').addEventListener('click',()=>{
     margin: 0,
     filename: 'CMR.pdf',
     image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak: { mode: ['css','legacy'] }
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      width: 794,
+      height: 1123,
+      windowWidth: 794,
+      windowHeight: 1123,
+      scrollX: 0,
+      scrollY: 0
+    },
+    jsPDF: { unit: 'mm', format: [210,297], orientation: 'portrait' },
+    pagebreak: { mode: [] }
   };
-  html2pdf().set(opt).from(element).save().then(()=>element.classList.remove('pdf-export')).catch(()=>element.classList.remove('pdf-export'));
+  html2pdf().set(opt).from(element).toPdf().get('pdf').then(pdf=>{
+    while(pdf.internal.getNumberOfPages()>1) pdf.deletePage(pdf.internal.getNumberOfPages());
+  }).save().then(()=>element.classList.remove('pdf-export')).catch(()=>element.classList.remove('pdf-export'));
 });
 
 recalc();
